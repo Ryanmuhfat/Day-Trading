@@ -29,14 +29,14 @@ for symbol in lq45_symbols:
         if df.empty: continue
         df["Symbol"] = symbol.replace(".JK", "")
         change_pct = (df["Close"][-1] - df["Open"][0]) / df["Open"][0] * 100
-        df["Change"] = change_pct
+        df["%Change"] = change_pct
         df["Volume 11"] = df.between_time("10:59", "11:01")["Volume"].mean()
         df["Volume 14"] = df.between_time("13:59", "14:01")["Volume"].mean()
         df["Volume 15:10"] = df.between_time("15:09", "15:11")["Volume"].mean()
         df["Total Volume"] = df["Volume"].sum()
         summary.append({
             "Symbol": df["Symbol"][0],
-            "Change": round(change_pct, 2),
+            "%Change": round(change_pct, 2),
             "Volume 11:00": int(df["Volume 11"][0]),
             "Volume 14:00": int(df["Volume 14"][0]),
             "Volume 15:10": int(df["Volume 15:10"][0]),
@@ -47,11 +47,11 @@ for symbol in lq45_symbols:
 
 # Buat dataframe hasil dan sort
 df_summary = pd.DataFrame(summary)
-top15 = df_summary.sort_values(by="Change", ascending=False).head(15)
+top15 = df_summary.sort_values(by="%Change", ascending=False).head(15)
 
 # Tampilkan grafik per saham
 for _, row in top15.iterrows():
-    st.subheader(f"{row['Symbol']} - Change: {row['Change']}%")
+    st.subheader(f"{row['Symbol']} - Change: {row['%Change']}%")
     fig, ax = plt.subplots()
     ax.bar(["11:00", "14:00", "15:10"],
            [row["Volume 11:00"], row["Volume 14:00"], row["Volume 15:10"]],
